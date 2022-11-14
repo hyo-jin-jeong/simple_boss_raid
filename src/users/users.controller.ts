@@ -1,6 +1,5 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Param, Post } from '@nestjs/common';
 
-import { User } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('user')
@@ -11,5 +10,14 @@ export class UsersController {
   async createUser() {
     const user = await this.userService.createUser();
     return { userId: user.id };
+  }
+  @Get(':userId')
+  async getUser(@Param('userId') userId: string) {
+    const user = await this.userService.getUser(userId);
+    const response = {
+      totalScore: user.totalScore,
+      bossRaidHistory: user.bossRaids,
+    };
+    return response;
   }
 }

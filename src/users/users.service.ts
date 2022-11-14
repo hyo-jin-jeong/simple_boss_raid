@@ -6,7 +6,10 @@ import { UserRepository } from './users.repository';
 export class UsersService {
   constructor(private userRepository: UserRepository) {}
 
-  createUser(): Promise<User> {
-    return this.userRepository.createUser();
+  async createUser(): Promise<User> {
+    return await this.userRepository.createUser();
+  }
+  async getUser(id: string): Promise<User> {
+    return await this.userRepository.getUser(id);
   }
 }
