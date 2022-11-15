@@ -58,7 +58,7 @@ export class BossRaidService {
     const levelInfo = Array.from(await bossRaidInfo['levels']).filter(
       (value) => value['level'] === level,
     );
-    if (!levelInfo) {
+    if (!levelInfo.length) {
       throw new BadRequestException('INVALID_LEVEL');
     }
     const bossRaidLimitSeconds = bossRaidInfo['bossRaidLimitSeconds'];
@@ -93,6 +93,7 @@ export class BossRaidService {
       (value) => value['level'] === bossRaid.level,
     );
     const score = levelInfo[0]['score'];
+
     if (!score) {
       throw new BadRequestException('INVALID_SCORE');
     }
