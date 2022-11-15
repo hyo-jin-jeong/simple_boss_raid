@@ -12,7 +12,7 @@ export class UsersController {
     return { userId: user.id };
   }
   @Get(':userId')
-  async getUser(@Param('userId') userId: string) {
+  async getUser(@Param('userId') userId: number) {
     const user = await this.userService.getUser(userId);
     const response = {
       totalScore: user.totalScore,

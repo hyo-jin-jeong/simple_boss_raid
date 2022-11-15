@@ -10,8 +10,8 @@ export class UsersService {
   async createUser(): Promise<User> {
     return await this.userRepository.createUser();
   }
-  async getUser(id: string): Promise<User> {
-    const user = await this.userRepository.getUserById(Number(id));
+  async getUser(id: number): Promise<User> {
+    const user = await this.userRepository.getUserById(id);
     if (!user) {
       throw new BadRequestException('INVALID_USER');
     }
