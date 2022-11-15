@@ -29,7 +29,16 @@ export class BossRaidController {
   @Get()
   async getBossRaidStatus() {
     const bossRaidStatus = await this.bossRaidService.getBossRaidStatus();
-    console.log('🚀 ~ bossRaidStatus', bossRaidStatus);
-    return { canEnter: !bossRaidStatus, enteredUserId: bossRaidStatus };
+    return {
+      canEnter: !bossRaidStatus,
+      enteredUserId: bossRaidStatus ? bossRaidStatus.id : null,
+    };
+  }
+
+  @Post('topRankerList')
+  async getBossRaidRank(@Body('userId') userId: number) {
+    const topRankerInfoList = await this.bossRaidService.getTopRankerInfoList();
+    const myRankingInfo = await this.bossRaidService.getMyRankingInfo(userId);
+    return { topRankerInfoList, myRankingInfo };
   }
 }

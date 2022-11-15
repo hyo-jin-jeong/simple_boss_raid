@@ -11,6 +11,8 @@ import { Cache } from 'cache-manager';
 import { UserRepository } from 'src/users/users.repository';
 import { BossRaid } from './bossRaid.entity';
 import { User } from 'src/users/user.entity';
+import { InjectRedis } from '@liaoliaots/nestjs-redis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class BossRaidService {
@@ -18,6 +20,7 @@ export class BossRaidService {
     private bossRaidRepository: BossRaidRepository,
     private userRepository: UserRepository,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    @InjectRedis() private readonly redis: Redis,
     private readonly httpService: HttpService,
   ) {
     this.getBossRaidInfo();
@@ -61,7 +64,7 @@ export class BossRaidService {
     );
   }
 
-  async endBossRaid(userId: number, raidRecordId: number) {
+  async endBossRaid(userId: number, raidRecordId: number): Promise<void> {
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw new BadRequestException('INVALID_USER');
@@ -94,9 +97,17 @@ export class BossRaidService {
     );
 
     if (!isRunning) {
-      throw new BadRequestException('TIME OUT');
+      throw new BadRequestException('TIME_OUT');
     }
-    await this.bossRaidRepository.updateBossRaid(user, bossRaid, score);
+    const updatedUser = await this.bossRaidRepository.updateBossRaid(
+      user,
+      bossRaid,
+      score,
+    );
+    if (!updatedUser) {
+      throw new BadRequestException('FAILD_UPDATE');
+    }
+    await this.redis.zadd('rank', updatedUser.totalScore, updatedUser.id);
   }
 
   async getBossRaidStatus(): Promise<User> | null {
@@ -111,5 +122,32 @@ export class BossRaidService {
       notEndBossRaid,
       bossRaidLimitSeconds,
     );
+  }
+  async changeToRankingInfoType(userId: number): Promise<RankingInfo> {
+    const score = Number(await this.redis.zscore('rank', userId));
+    return {
+      ranking: await this.redis.zrevrank('rank', userId),
+      userId,
+      totalScore: score,
+    };
+  }
+
+  async getTopRankerInfoList(): Promise<RankingInfo[]> {
+    const topRankerInfoList = await Promise.all(
+      (
+        await this.redis.zrevrange('rank', 0, 10)
+      ).map(
+        async (userId) => await this.changeToRankingInfoType(Number(userId)),
+      ),
+    );
+    return topRankerInfoList;
+  }
+
+  async getMyRankingInfo(userId: number): Promise<RankingInfo> {
+    const user = await this.userRepository.getUserById(userId);
+    if (!user) {
+      throw new BadRequestException('INVALID_USER');
+    }
+    return await this.changeToRankingInfoType(userId);
   }
 }

@@ -39,11 +39,15 @@ export class BossRaidRepository extends Repository<BossRaid> {
     }
   }
 
-  async getBossRaidById(id: number) {
+  async getBossRaidById(id: number): Promise<BossRaid> | null {
     return await this.findOne({ relations: { user: true }, where: { id } });
   }
 
-  async updateBossRaid(user: User, bossRaid: BossRaid, score: number) {
+  async updateBossRaid(
+    user: User,
+    bossRaid: BossRaid,
+    score: number,
+  ): Promise<void | User> {
     bossRaid.endTime = new Date();
     bossRaid.score = score;
     user.totalScore += score;
@@ -54,6 +58,7 @@ export class BossRaidRepository extends Repository<BossRaid> {
       await bossRaid.save();
       await user.save();
       await queryRunner.commitTransaction();
+      return user;
     } catch (err) {
       console.error(err);
       await queryRunner.rollbackTransaction();
@@ -61,6 +66,7 @@ export class BossRaidRepository extends Repository<BossRaid> {
       await queryRunner.release();
     }
   }
+
   async getNotEndBoss(): Promise<BossRaid> | null {
     return await this.findOne({
       relations: { user: true },
