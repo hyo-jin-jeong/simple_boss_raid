@@ -1,6 +1,7 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -16,10 +17,12 @@ export class BossRaid extends BaseEntity {
   @Column()
   score: number;
 
-  @Column({ name: 'enter_time' })
+  @CreateDateColumn({
+    name: 'enter_time',
+  })
   enterTime: Date;
 
-  @Column({ name: 'end_time' })
+  @Column({ name: 'end_time', nullable: true })
   endTime: Date;
 
   @ManyToOne(() => User, (user) => user.bossRaids)

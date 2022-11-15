@@ -10,6 +10,6 @@ export class UsersService {
     return await this.userRepository.createUser();
   }
   async getUser(id: string): Promise<User> {
-    return await this.userRepository.getUser(id);
+    return await this.userRepository.getUser(Number(id));
   }
 }
