@@ -8,7 +8,7 @@ import { User } from 'src/users/user.entity';
 export class BossRaidRepository extends Repository<BossRaid> {
   async createBossRaid(
     user: User,
-    score: number,
+    level: number,
     bossRaidLimitSeconds: number,
   ): Promise<BossRaid> | null {
     const now = new Date();
@@ -29,7 +29,7 @@ export class BossRaidRepository extends Repository<BossRaid> {
           return null;
         }
       }
-      const bossRaid = this.create({ user, score });
+      const bossRaid = this.create({ user, level });
       await bossRaid.save();
       await queryRunner.commitTransaction();
       return bossRaid;
@@ -37,6 +37,38 @@ export class BossRaidRepository extends Repository<BossRaid> {
       console.error(err);
       await queryRunner.rollbackTransaction();
       return null;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+  async getBossRaidById(id: number) {
+    return await this.findOne({ where: { id } });
+  }
+  async updateBossRaid(
+    user: User,
+    bossRaid: BossRaid,
+    score: number,
+    bossRaidLimitSeconds: number,
+  ) {
+    const enterTime = bossRaid.enterTime;
+    const now = new Date();
+    enterTime.setSeconds(enterTime.getSeconds() + bossRaidLimitSeconds);
+    bossRaid.endTime = new Date();
+    console.log(now, enterTime);
+    if (now < enterTime) {
+      bossRaid.score = score;
+    }
+    user.totalScore += score;
+    const queryRunner = this.manager.connection.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction('READ UNCOMMITTED');
+    try {
+      await bossRaid.save();
+      await user.save();
+      await queryRunner.commitTransaction();
+    } catch (err) {
+      console.error(err);
+      await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
     }

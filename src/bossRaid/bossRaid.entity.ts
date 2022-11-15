@@ -14,7 +14,10 @@ export class BossRaid extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ default: 0 })
+  level: number;
+
+  @Column({ default: 0 })
   score: number;
 
   @CreateDateColumn({

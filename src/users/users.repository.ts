@@ -9,7 +9,7 @@ export class UserRepository extends Repository<User> {
     await this.save(user);
     return user;
   }
-  async getUser(id: number): Promise<User> {
+  async getUserById(id: number): Promise<User> {
     const user = await this.findOne({
       where: { id },
       relations: { bossRaids: true },

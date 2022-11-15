@@ -17,4 +17,12 @@ export class BossRaidController {
     }
     return { isEntered: true, raidRecordId: bossRaid.id };
   }
+
+  @Post('end')
+  async endBossRaid(
+    @Body('userId') userId: number,
+    @Body('raidRecordId') raidRecordId: number,
+  ) {
+    this.bossRaidService.endBossRaid(userId, raidRecordId);
+  }
 }
