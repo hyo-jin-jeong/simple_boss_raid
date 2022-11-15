@@ -10,6 +10,7 @@ import { firstValueFrom } from 'rxjs';
 import { Cache } from 'cache-manager';
 import { UserRepository } from 'src/users/users.repository';
 import { BossRaid } from './bossRaid.entity';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class BossRaidService {
@@ -87,10 +88,27 @@ export class BossRaidService {
       throw new BadRequestException('INVALID_SCORE');
     }
     const bossRaidLimitSeconds = bossRaidInfo['bossRaidLimitSeconds'];
-    await this.bossRaidRepository.updateBossRaid(
-      user,
+    const isRunning = this.bossRaidRepository.isRunningBossRaid(
       bossRaid,
-      score,
+      bossRaidLimitSeconds,
+    );
+
+    if (!isRunning) {
+      throw new BadRequestException('TIME OUT');
+    }
+    await this.bossRaidRepository.updateBossRaid(user, bossRaid, score);
+  }
+
+  async getBossRaidStatus(): Promise<User> | null {
+    let bossRaidInfo = await this.cacheManager.get('bossRaidInfo');
+    if (!bossRaidInfo) {
+      await this.getBossRaidInfo();
+      bossRaidInfo = await this.cacheManager.get('bossRaidInfo');
+    }
+    const bossRaidLimitSeconds = bossRaidInfo['bossRaidLimitSeconds'];
+    const notEndBossRaid = await this.bossRaidRepository.getNotEndBoss();
+    return this.bossRaidRepository.isRunningBossRaid(
+      notEndBossRaid,
       bossRaidLimitSeconds,
     );
   }

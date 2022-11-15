@@ -11,20 +11,17 @@ export class BossRaidRepository extends Repository<BossRaid> {
     level: number,
     bossRaidLimitSeconds: number,
   ): Promise<BossRaid> | null {
-    const now = new Date();
     const queryRunner = this.manager.connection.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
-      const isBossRaid = await queryRunner.manager.findOneBy(BossRaid, {
-        endTime: IsNull(),
-      });
-      if (isBossRaid) {
-        const enterTime = isBossRaid.enterTime;
-        enterTime.setSeconds(
-          isBossRaid.enterTime.getSeconds() + bossRaidLimitSeconds,
+      const notEndBossRaid = await this.getNotEndBoss();
+      if (notEndBossRaid) {
+        const status = this.isRunningBossRaid(
+          notEndBossRaid,
+          bossRaidLimitSeconds,
         );
-        if (now < enterTime) {
+        if (status) {
           await queryRunner.rollbackTransaction();
           return null;
         }
@@ -41,23 +38,14 @@ export class BossRaidRepository extends Repository<BossRaid> {
       await queryRunner.release();
     }
   }
+
   async getBossRaidById(id: number) {
-    return await this.findOne({ where: { id } });
+    return await this.findOne({ relations: { user: true }, where: { id } });
   }
-  async updateBossRaid(
-    user: User,
-    bossRaid: BossRaid,
-    score: number,
-    bossRaidLimitSeconds: number,
-  ) {
-    const enterTime = bossRaid.enterTime;
-    const now = new Date();
-    enterTime.setSeconds(enterTime.getSeconds() + bossRaidLimitSeconds);
+
+  async updateBossRaid(user: User, bossRaid: BossRaid, score: number) {
     bossRaid.endTime = new Date();
-    console.log(now, enterTime);
-    if (now < enterTime) {
-      bossRaid.score = score;
-    }
+    bossRaid.score = score;
     user.totalScore += score;
     const queryRunner = this.manager.connection.createQueryRunner();
     await queryRunner.connect();
@@ -71,6 +59,34 @@ export class BossRaidRepository extends Repository<BossRaid> {
       await queryRunner.rollbackTransaction();
     } finally {
       await queryRunner.release();
+    }
+  }
+  async getNotEndBoss(): Promise<BossRaid> | null {
+    return await this.findOne({
+      relations: { user: true },
+      where: {
+        endTime: IsNull(),
+      },
+      order: {
+        enterTime: 'desc',
+      },
+    });
+  }
+
+  isRunningBossRaid(
+    bossRaid: BossRaid,
+    bossRaidLimitSeconds: number,
+  ): User | null {
+    const now = new Date();
+    if (bossRaid) {
+      const enterTime = bossRaid.enterTime;
+      enterTime.setSeconds(
+        bossRaid.enterTime.getSeconds() + bossRaidLimitSeconds,
+      );
+      if (now < enterTime) {
+        return bossRaid.user;
+      }
+      return null;
     }
   }
 }

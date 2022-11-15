@@ -10,7 +10,7 @@ import { UserRepository } from 'src/users/users.repository';
 @Module({
   imports: [
     TypeOrmExModule.forCustomRepository([BossRaidRepository, UserRepository]),
-    CacheModule.register(),
+    CacheModule.register({ isGlobal: true }),
     HttpModule,
   ],
   controllers: [BossRaidController],
