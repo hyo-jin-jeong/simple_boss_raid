@@ -1,52 +1,77 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# commerce_platform
+## 프로젝트 개요
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**보스레이드 PVE 컨텐츠 관련 api 구현**
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+> 유저 생성, 조회, 보스레이드 상태 조회, 보스레이드 시작, 종료, 랭킹 조회 기능을 구현 하였습니다.<br>
 
-## Description
+## 기술 스택
+- Framework: NestJs
+- Language: typescript
+- ODM : typeorm
+- DB : mysql 
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 요구사항 분석 및 구현 사항 정리
+### 기술 관련
+- radis 사용하여 랭킹 기능 구현
+- 웹 캐시 사용하여 static data 활용
 
-## Installation
+구현 사항 정리 예정
 
+
+    
+## DB Modeling
+User - BossRaid : 1 - M
+
+
+## API 문서
+자세한 내용은 아래 링크 참조<br>
+[POSTMAN DOCS](https://documenter.getpostman.com/view/11539438/2s8YmHx5Fb).
+|기능구분| 기능  | Method | URL |  
+|-------------| ------------- | ------------- |:-------------|
+| User | 유저 생성 | POST | /user  |    
+|  | 유저 조회 | GET | /user/:userId  | 
+| BossRaid | 보스레이드 상태 조회 | GET  |/bossRaid|
+|  |  보스레이드 시작  | POST |/bossRaid/enter |
+|  |  보스레이드 종료  | PATCH |/bossRaid/end |
+|  |  랭킹 조회  | POST |/bossRaid/topRankerList |
+
+## 테스트 구현
+jest를 사용하여 구현중에 있습니다.
+
+## 설치 및 실행 방법
+nodejs와 npm이 install 되어있지 않다면 먼저 install 과정 진행
+<details>
+    <summary> 프로젝트 설치 밀 실행 과정</summary>
+
+<b>1. 프로젝트 clone 및 디렉토리 이동</b>
 ```bash
-$ npm install
+git clone https://github.com/simple_boss_raid.git
+cd simple_boss_raid
 ```
-
-## Running the app
-
+<b>2. .env 파일 생성</b>
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+DB=
+DB_HOST=
+DB_PORT=
+DB_USERNAME=
+DB_PASSWORD=
+DB_NAME=
 ```
+<b>3. node package 설치</b>
+```javascript
+npm install
+```
+<b>4. 서버 실행</b>
+```javascript
+npm run start
+```
+</details>
 
-## Test
-
+<details>
+    <summary>Test 실행 방법</summary>
+    
+<b>unit test 실행</b>
 ```bash
 # unit tests
 $ npm run test
@@ -57,17 +82,5 @@ $ npm run test:e2e
 # test coverage
 $ npm run test:cov
 ```
+</details>
 
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
