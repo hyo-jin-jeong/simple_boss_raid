@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-import { BossRaid } from '../bossRaids/bossRaid.entity';
+import { BossRaid } from '../bossRaid/bossRaid.entity';
 
 @Entity('users')
 export class User extends BaseEntity {

@@ -16,7 +16,10 @@ export class UsersController {
     const user = await this.userService.getUser(userId);
     const response = {
       totalScore: user.totalScore,
-      bossRaidHistory: user.bossRaids,
+      bossRaidHistory: user.bossRaids.map((bossRaid) => {
+        const { id, ...data } = bossRaid;
+        return { raidRecordId: id, ...data };
+      }),
     };
     return response;
   }

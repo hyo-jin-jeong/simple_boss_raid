@@ -1,5 +1,6 @@
 import * as Joi from 'joi';
 
+import { BossRaidModule } from './bossRaid/bossRaid.module';
 import { ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -32,6 +33,7 @@ import { UsersModule } from './users/users.module';
       logging: true,
     }),
     UsersModule,
+    BossRaidModule,
   ],
 })
 export class AppModule {}
