@@ -1,17 +1,25 @@
-import { Body, Controller, Get, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 
 import { BossRaidService } from './bossRaid.service';
+import { StartBossRaidDto } from './dto/startBossRaid';
+import { EndBossRaidDto } from './dto/startBossRaid copy';
 
 @Controller('bossRaid')
 export class BossRaidController {
   constructor(private bossRaidService: BossRaidService) {}
 
   @Post('enter')
-  async startBossRaid(
-    @Body('userId') userId: number,
-    @Body('level') level: number,
-  ) {
-    const bossRaid = await this.bossRaidService.startBossRaid(userId, level);
+  @UsePipes(ValidationPipe)
+  async startBossRaid(@Body() startBossRaidDto: StartBossRaidDto) {
+    const bossRaid = await this.bossRaidService.startBossRaid(startBossRaidDto);
     if (!bossRaid) {
       return { isEntered: false };
     }
@@ -19,11 +27,9 @@ export class BossRaidController {
   }
 
   @Patch('end')
-  async endBossRaid(
-    @Body('userId') userId: number,
-    @Body('raidRecordId') raidRecordId: number,
-  ) {
-    this.bossRaidService.endBossRaid(userId, raidRecordId);
+  @UsePipes(ValidationPipe)
+  async endBossRaid(@Body() endBossRaidDto: EndBossRaidDto) {
+    await this.bossRaidService.endBossRaid(endBossRaidDto);
   }
 
   @Get()

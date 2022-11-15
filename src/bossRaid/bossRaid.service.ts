@@ -13,6 +13,8 @@ import { BossRaid } from './bossRaid.entity';
 import { User } from 'src/users/user.entity';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
+import { StartBossRaidDto } from './dto/startBossRaid';
+import { EndBossRaidDto } from './dto/startBossRaid copy';
 
 @Injectable()
 export class BossRaidService {
@@ -40,7 +42,10 @@ export class BossRaidService {
       });
   }
 
-  async startBossRaid(userId: number, level: number): Promise<BossRaid> | null {
+  async startBossRaid(
+    startBossRaidDto: StartBossRaidDto,
+  ): Promise<BossRaid> | null {
+    const { userId, level } = startBossRaidDto;
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw new BadRequestException('INVALID_USER');
@@ -64,7 +69,8 @@ export class BossRaidService {
     );
   }
 
-  async endBossRaid(userId: number, raidRecordId: number): Promise<void> {
+  async endBossRaid(endBossRaidDto: EndBossRaidDto): Promise<void> {
+    const { userId, raidRecordId } = endBossRaidDto;
     const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw new BadRequestException('INVALID_USER');
