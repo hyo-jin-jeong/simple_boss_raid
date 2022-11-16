@@ -8,7 +8,7 @@
 ## 기술 스택
 - Framework: NestJs
 - Language: typescript
-- ODM : typeorm
+- ORM : typeorm
 - DB : mysql 
 
 ## 요구사항 분석 및 구현 사항 정리
