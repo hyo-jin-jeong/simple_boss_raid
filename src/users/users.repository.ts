@@ -9,11 +9,18 @@ export class UserRepository extends Repository<User> {
     await this.save(user);
     return user;
   }
+
   async getUserById(id: number): Promise<User> {
     const user = await this.findOne({
       where: { id },
       relations: { bossRaids: true },
     });
+    return user;
+  }
+
+  async updateUserTotalScore(user: User, score: number): Promise<User> {
+    user.totalScore += score;
+    await user.save();
     return user;
   }
 }
