@@ -10,7 +10,6 @@ import { firstValueFrom } from 'rxjs';
 import { Cache } from 'cache-manager';
 import { UserRepository } from 'src/users/users.repository';
 import { BossRaid } from './bossRaid.entity';
-import { User } from 'src/users/user.entity';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
 import {
@@ -59,7 +58,7 @@ export class BossRaidService {
     enterBossRaidRequestDto: EnterBossRaidRequestDto,
   ): Promise<EnterBossRaidReponseDto> {
     const { userId, level } = enterBossRaidRequestDto;
-    const user: User = await this.userRepository.getUserById(userId);
+    const user = await this.userRepository.getUserById(userId);
     if (!user) {
       throw new BadRequestException('INVALID_USER');
     }
