@@ -23,6 +23,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BossRaidService {
+  private STATIC_DATA_URL: string;
+  private CACHE_TTL: number;
   constructor(
     private bossRaidRepository: BossRaidRepository,
     private userRepository: UserRepository,
@@ -31,21 +33,21 @@ export class BossRaidService {
     private readonly httpService: HttpService,
     private configService: ConfigService,
   ) {
+    this.STATIC_DATA_URL = this.configService.get<string>('STATIC_DATA_URL');
+    this.CACHE_TTL = Number(this.configService.get<string>('CACHE_TTL'));
     this.saveBossRaidInfo();
   }
   async saveBossRaidInfo() {
-    const REDIS_URL = this.configService.get<string>('REDIS_URL');
-
-    await firstValueFrom(this.httpService.get(REDIS_URL))
+    await firstValueFrom(this.httpService.get(this.STATIC_DATA_URL))
       .then(async (result) => {
         const bossRaids = result.data['bossRaids'][0];
         const levels = bossRaids['levels'];
         const bossRaidLimitSeconds = bossRaids['bossRaidLimitSeconds'];
-        await this.cacheManager.set('levels', levels, 0);
+        await this.cacheManager.set('levels', levels, this.CACHE_TTL);
         await this.cacheManager.set(
           'bossRaidLimitSeconds',
           bossRaidLimitSeconds,
-          0,
+          this.CACHE_TTL,
         );
       })
       .catch((err) => {
@@ -193,9 +195,11 @@ export class BossRaidService {
 
   async getLevelInfo(level: number) {
     let levels: LevelInfo[] = await this.cacheManager.get('levels');
+    console.log('🚀 ~ levels', levels);
     if (!levels) {
       await this.saveBossRaidInfo();
       levels = await this.cacheManager.get('levels');
+      console.log('🚀 ~ levels222', levels);
     }
     return levels.filter((value) => value['level'] === level)[0];
   }
