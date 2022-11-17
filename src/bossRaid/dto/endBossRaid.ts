@@ -1,5 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
-export class EndBossRaidDto {
+export class EndBossRaidRequestDto {
   @IsNotEmpty()
   userId: number;
 
