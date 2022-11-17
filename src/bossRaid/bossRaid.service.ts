@@ -19,6 +19,7 @@ import {
 } from './dto/enterBossRaid';
 import { EndBossRaidRequestDto } from './dto/endBossRaid';
 import { GetBossRaidStatusResponseDto } from './dto/getBossRaidStatus';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BossRaidService {
@@ -28,15 +29,14 @@ export class BossRaidService {
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     @InjectRedis() private readonly redis: Redis,
     private readonly httpService: HttpService,
+    private configService: ConfigService,
   ) {
     this.saveBossRaidInfo();
   }
   async saveBossRaidInfo() {
-    await firstValueFrom(
-      this.httpService.get(
-        'https://dmpilf5svl7rv.cloudfront.net/assignment/backend/bossRaidData.json',
-      ),
-    )
+    const REDIS_URL = this.configService.get<string>('REDIS_URL');
+
+    await firstValueFrom(this.httpService.get(REDIS_URL))
       .then(async (result) => {
         const bossRaids = result.data['bossRaids'][0];
         const levels = bossRaids['levels'];
