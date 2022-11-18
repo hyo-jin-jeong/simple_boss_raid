@@ -16,9 +16,4 @@ export class UserRepository extends Repository<User> {
     });
     return user;
   }
-  async updateUserTotalScore(user: User, score: number): Promise<User> {
-    user.totalScore += score;
-    await user.save();
-    return user;
-  }
 }
