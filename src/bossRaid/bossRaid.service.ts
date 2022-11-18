@@ -19,6 +19,8 @@ import {
 import { EndBossRaidRequestDto } from './dto/endBossRaid';
 import { GetBossRaidStatusResponseDto } from './dto/getBossRaidStatus';
 import { ConfigService } from '@nestjs/config';
+import { DataSource, IsNull } from 'typeorm';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class BossRaidService {
@@ -31,6 +33,7 @@ export class BossRaidService {
     @InjectRedis() private readonly redis: Redis,
     private readonly httpService: HttpService,
     private configService: ConfigService,
+    private dataSource: DataSource,
   ) {
     this.STATIC_DATA_URL = this.configService.get<string>('STATIC_DATA_URL');
     this.CACHE_TTL = Number(this.configService.get<string>('CACHE_TTL'));
@@ -68,13 +71,21 @@ export class BossRaidService {
       throw new BadRequestException('INVALID_LEVEL');
     }
 
-    const queryRunner =
-      this.bossRaidRepository.manager.connection.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('REPEATABLE READ');
     try {
       /*이미 시작한 보스레이드가 있는지 확인*/
-      const startedBossRaid = await this.bossRaidRepository.isStartedBosRaid();
+      const startedBossRaid = await queryRunner.manager.findOne(BossRaid, {
+        relations: { user: true },
+        where: {
+          endTime: IsNull(),
+        },
+        order: {
+          enterTime: 'desc',
+        },
+      });
+
       if (startedBossRaid) {
         const isTimeout = await this.isTimeoutBossRaid(startedBossRaid);
         /*타임아웃 된 보스레이드인지 확인*/
@@ -83,10 +94,12 @@ export class BossRaidService {
           return { isEntered: false };
         }
       }
-      const bossRaid = await this.bossRaidRepository.createBossRaid(
+
+      const bossRaid = await queryRunner.manager.save(BossRaid, {
         user,
         level,
-      );
+      });
+
       await queryRunner.commitTransaction();
       return { isEntered: true, raidRecordId: bossRaid.id };
     } catch (err) {
@@ -128,16 +141,18 @@ export class BossRaidService {
     if (isTimeout) {
       throw new BadRequestException('TIME_OUT');
     }
-    const queryRunner =
-      this.bossRaidRepository.manager.connection.createQueryRunner();
+
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ UNCOMMITTED');
     try {
-      await this.bossRaidRepository.updateEndedBossRaid(bossRaid, score);
-      const updatedUser = await this.userRepository.updateUserTotalScore(
-        user,
-        score,
-      );
+      bossRaid.endTime = new Date();
+      bossRaid.score = score;
+      await queryRunner.manager.save(BossRaid, bossRaid);
+
+      user.totalScore += score;
+      const updatedUser = await queryRunner.manager.save(User, user);
+
       await queryRunner.commitTransaction();
       await this.redis.zadd('rank', updatedUser.totalScore, updatedUser.id);
     } catch (err) {
@@ -194,11 +209,9 @@ export class BossRaidService {
 
   async getLevelInfo(level: number) {
     let levels: LevelInfo[] = await this.cacheManager.get('levels');
-    console.log('🚀 ~ levels', levels);
     if (!levels) {
       await this.saveBossRaidInfo();
       levels = await this.cacheManager.get('levels');
-      console.log('🚀 ~ levels222', levels);
     }
     return levels.filter((value) => value['level'] === level)[0];
   }

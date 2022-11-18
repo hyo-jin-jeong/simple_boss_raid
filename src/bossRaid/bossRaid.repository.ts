@@ -17,12 +17,6 @@ export class BossRaidRepository extends Repository<BossRaid> {
     return await this.findOne({ relations: { user: true }, where: { id } });
   }
 
-  async updateEndedBossRaid(bossRaid: BossRaid, score: number) {
-    bossRaid.endTime = new Date();
-    bossRaid.score = score;
-    return await bossRaid.save();
-  }
-
   async isStartedBosRaid(): Promise<BossRaid> {
     return await this.findOne({
       relations: { user: true },
