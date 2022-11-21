@@ -8,7 +8,7 @@ import {
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Cache } from 'cache-manager';
-import { UserRepository } from 'src/users/users.repository';
+import { UserRepository } from '../users/users.repository';
 import { BossRaid } from './bossRaid.entity';
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
@@ -20,7 +20,7 @@ import { EndBossRaidRequestDto } from './dto/endBossRaid';
 import { GetBossRaidStatusResponseDto } from './dto/getBossRaidStatus';
 import { ConfigService } from '@nestjs/config';
 import { DataSource, IsNull } from 'typeorm';
-import { User } from 'src/users/user.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class BossRaidService {

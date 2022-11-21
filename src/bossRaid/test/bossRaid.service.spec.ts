@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { BossRaidService } from './bossRaid.service';
+import { BossRaidService } from '../bossRaid.service';
 
 describe('BossRaidService', () => {
   let service: BossRaidService;
