@@ -1,8 +1,8 @@
 import { IsNull, Repository } from 'typeorm';
 
 import { BossRaid } from './bossRaid.entity';
-import { CustomRepository } from 'src/db/typeorm-ex.decorator';
-import { User } from 'src/users/user.entity';
+import { CustomRepository } from '../db/typeorm-ex.decorator';
+import { User } from '../users/user.entity';
 
 @CustomRepository(BossRaid)
 export class BossRaidRepository extends Repository<BossRaid> {
