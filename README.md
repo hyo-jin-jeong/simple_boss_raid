@@ -39,7 +39,7 @@ User - BossRaid : 1 - M
 ## 테스트 구현
 - bossRaid controller uni test 구현
 <img width="395" alt="image" src="https://user-images.githubusercontent.com/55984573/203083559-2ea80055-344e-4de2-acc9-13d715aaccbb.png">
-
+=> controller 로직은 특별한 분기 없이 service 실행만 하므로 성공 했을 경우 mocking한 service method의 실행여부와 return 값 비교만 해주었습니다.
 ## 설치 및 실행 방법
 nodejs와 npm이 install 되어있지 않다면 먼저 install 과정 진행
 <details>
