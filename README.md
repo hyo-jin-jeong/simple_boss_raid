@@ -51,12 +51,15 @@ cd simple_boss_raid
 ```
 <b>2. .env 파일 생성</b>
 ```bash
-DB=
 DB_HOST=
 DB_PORT=
 DB_USERNAME=
 DB_PASSWORD=
 DB_NAME=
+REDIS_PORT=
+REDIS_HOST=
+STATIC_DATA_URL=
+CACHE_TTL=
 ```
 <b>3. node package 설치</b>
 ```javascript
