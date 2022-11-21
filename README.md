@@ -37,7 +37,8 @@ User - BossRaid : 1 - M
 |  |  랭킹 조회  | POST |/bossRaid/topRankerList |
 
 ## 테스트 구현
-jest를 사용하여 구현중에 있습니다.
+- bossRaid controller uni test 구현
+<img width="395" alt="image" src="https://user-images.githubusercontent.com/55984573/203083559-2ea80055-344e-4de2-acc9-13d715aaccbb.png">
 
 ## 설치 및 실행 방법
 nodejs와 npm이 install 되어있지 않다면 먼저 install 과정 진행
