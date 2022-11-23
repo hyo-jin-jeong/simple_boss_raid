@@ -8,11 +8,11 @@
 - Framework: NestJs
 - Language: typescript
 - ORM : typeorm
-- DB : mysql 
+- DB : mysql
 
 ## 요구사항 분석 및 구현 사항 정리
 ### 기술 관련
-- radis 사용하여 랭킹 기능 구현
+- redis 사용하여 랭킹 기능 구현
 - 웹 캐시 사용하여 static data 활용
 
 구현 사항 정리 예정
