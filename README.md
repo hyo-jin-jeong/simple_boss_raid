@@ -1,4 +1,3 @@
-# commerce_platform
 ## 프로젝트 개요
 
 **보스레이드 PVE 컨텐츠 관련 api 구현**
